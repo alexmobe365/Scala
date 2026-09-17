@@ -1,0 +1,1457 @@
+### Ejercicio 1 — Catálogo de productos como lista
+
+Una tienda gestiona su catálogo en una lista plana que alterna nombre de producto y precio. Trabaja con esta estructura sin convertirla todavía a diccionario.
+
+```python
+catalogo = [
+    "Auriculares BT", 59.90,
+    "Smartwatch S2", 149.00,
+    "Tablet 10", 219.00,
+    "Cargador USB-C", 18.50,
+    "Cafetera Expres", 189.00,
+    "Robot Aspirador", 279.00,
+]
+```
+
+**Se pide:**
+
+1. Imprime el número total de elementos de la lista y deduce cuántos productos hay.
+2. Usando *slicing con paso*, crea `nombres` con todos los nombres y `precios` con todos los precios.
+3. Obtén el precio del `"Robot Aspirador"` **sin escribir el índice a mano**: localiza su posición con `.index()` y usa esa posición para llegar al precio.
+4. Crea `ultimos_tres_nombres` con los tres últimos productos usando índices negativos.
+5. Calcula e imprime el precio medio del catálogo redondeado a dos decimales, usando únicamente `sum()`, `len()` y `round()`.
+
+**Comprobación:** `nombres` debe tener 6 elementos y `precios` debe sumar 914,40.
+
+> **Pista:** `lista[inicio:fin:paso]`. Con paso 2 desde el índice 0 obtienes las posiciones pares, desde el índice 1 las impares.
+>
+catalogo = [
+    "Auriculares BT", 59.90,
+    "Smartwatch S2", 149.00,
+    "Tablet 10", 219.00,
+    "Cargador USB-C", 18.50,
+    "Cafetera Expres", 189.00,
+    "Robot Aspirador", 279.00,
+]
+
+# 1. Número de elementos y productos
+print(len(catalogo))          # 12 elementos
+print(len(catalogo) // 2)     # 6 productos
+
+
+# 2. Nombres y precios usando slicing con paso
+nombres = catalogo[0::2]
+precios = catalogo[1::2]
+
+print(nombres)
+print(precios)
+
+
+# 3. Precio de "Robot Aspirador" sin escribir el índice
+posicion = catalogo.index("Robot Aspirador")
+precio_robot = catalogo[posicion + 1]
+
+print(precio_robot)            # 279.00
+
+
+# 4. Tres últimos nombres usando índices negativos
+ultimos_tres_nombres = nombres[-3:]
+
+print(ultimos_tres_nombres)
+
+
+# 5. Precio medio del catálogo
+precio_medio = round(sum(precios) / len(precios), 2)
+
+print(precio_medio)            # 152.40
+
+
+### Ejercicio 2 — Inventario multialmacén con listas anidadas
+
+El inventario de tres almacenes se representa como una lista de listas. Cada sublista sigue el formato `[codigo_almacen, producto, unidades, coste_unitario]`.
+
+```python
+inventario = [
+    ["ALM-NORTE", "Robot Aspirador", 34, 201.50],
+    ["ALM-NORTE", "Monitor 27", 58, 142.00],
+    ["ALM-SUR",   "Silla Ergonomica", 12, 178.90],
+    ["ALM-SUR",   "Robot Aspirador", 7, 201.50],
+    ["ALM-ESTE",  "Cafetera Expres", 41, 131.20],
+    ["ALM-ESTE",  "Monitor 27", 25, 142.00],
+]
+```
+
+**Se pide:**
+
+1. Imprime el nombre del producto de la **cuarta** fila usando doble indexación.
+2. Crea una nueva lista `valor_stock` donde cada elemento sea `[producto, unidades * coste_unitario]` redondeado a dos decimales. Resuélvelo con un bucle `for` sobre `inventario`.
+3. Calcula el **valor inmovilizado total** del inventario.
+4. Extrae, mediante *slicing*, una sublista con solo las filas del `ALM-SUR` (usa el hecho de que están contiguas) y calcula su valor.
+5. Explica en una celda Markdown de **dos frases** qué problema aparece si dos almacenes dejan de estar contiguos y por qué el *slicing* no es una estrategia robusta de filtrado.
+
+**Comprobación:** el valor inmovilizado total debe ser 27 573,50 € y el del `ALM-SUR`, 3 557,30 €.
+inventario = [
+    ["ALM-NORTE", "Robot Aspirador", 34, 201.50],
+    ["ALM-NORTE", "Monitor 27", 58, 142.00],
+    ["ALM-SUR",   "Silla Ergonomica", 12, 178.90],
+    ["ALM-SUR",   "Robot Aspirador", 7, 201.50],
+    ["ALM-ESTE",  "Cafetera Expres", 41, 131.20],
+    ["ALM-ESTE",  "Monitor 27", 25, 142.00],
+]
+
+# 1. Producto de la cuarta fila
+print(inventario[3][1])   # Robot Aspirador
+
+
+# 2. Crear valor_stock
+valor_stock = []
+
+for fila in inventario:
+    producto = fila[1]
+    unidades = fila[2]
+    coste_unitario = fila[3]
+    
+    valor = round(unidades * coste_unitario, 2)
+    valor_stock.append([producto, valor])
+
+print(valor_stock)
+
+
+# 3. Valor inmovilizado total
+valor_total = sum(fila[1] for fila in valor_stock)
+
+print(valor_total)   # 27573.50
+
+
+# 4. Filas de ALM-SUR mediante slicing
+alm_sur = inventario[2:4]
+
+valor_sur = sum(fila[2] * fila[3] for fila in alm_sur)
+
+print(alm_sur)
+print(round(valor_sur, 2))   # 3557.30
+
+
+
+### Ejercicio 3 — Manipulación destructiva y copias de listas
+
+Este ejercicio trabaja el comportamiento interno de las listas (referencias frente a copias).
+
+```python
+precios_originales = [59.90, 149.00, 219.00, 18.50, 189.00, 279.00]
+
+```
+
+**Se pide:**
+
+1. Crea `precios_rebajados = precios_originales` y modifica el primer elemento de `precios_rebajados` a `49.90`. Imprime **las dos listas** y explica qué ha ocurrido.
+2. Restaura el valor original. Ahora crea dos copias independientes: una con `list()` y otra con *slicing* completo `[:]`. Demuestra con `print()` que modificar la copia ya no afecta al original.
+3. Sobre una copia, aplica una rebaja del 10 % a **todos** los elementos usando un bucle `for` con `range(len(...))`.
+4. Añade dos productos nuevos con `.extend()` y un tercero en la **posición 2** con `.insert()`.
+5. Elimina el elemento de la posición 4 con `del` y el último con `.pop()`, guardando el valor extraído en una variable `descartado`.
+6. Comprueba con `id()` que `precios_originales` y cada copia apuntan a objetos distintos en memoria.
+
+> **Pista:** una asignación con `=` no copia la lista, copia la referencia. Es el error más caro de depurar en proyectos de datos reales.
+
+precios_originales = [59.90, 149.00, 219.00, 18.50, 189.00, 279.00]
+
+
+# 1. Asignación por referencia
+precios_rebajados = precios_originales
+
+precios_rebajados[0] = 49.90
+
+print(precios_originales)
+print(precios_rebajados)
+
+# Ambas listas cambian porque apuntan al mismo objeto.
+
+
+# 2. Restaurar y crear copias independientes
+precios_originales[0] = 59.90
+
+copia_lista = list(precios_originales)
+copia_slicing = precios_originales[:]
+
+copia_lista[0] = 50.00
+copia_slicing[1] = 100.00
+
+print(precios_originales)
+print(copia_lista)
+print(copia_slicing)
+
+# Modificar una copia no afecta a la lista original.
+
+
+# 3. Rebaja del 10 % usando for + range
+for i in range(len(copia_lista)):
+    copia_lista[i] = round(copia_lista[i] * 0.90, 2)
+
+print(copia_lista)
+
+
+# 4. Añadir productos con extend() e insert()
+copia_lista.extend([99.90, 129.90])
+copia_lista.insert(2, 199.90)
+
+print(copia_lista)
+
+
+# 5. Eliminar posición 4 y último elemento
+del copia_lista[4]
+
+descartado = copia_lista.pop()
+
+print(copia_lista)
+print(descartado)
+
+
+# 6. Comprobar IDs
+print(id(precios_originales))
+print(id(precios_rebajados))
+print(id(copia_lista))
+print(id(copia_slicing))
+
+### Ejercicio 4 — Cola de pedidos pendientes
+
+La cola de pedidos de un almacén se gestiona como lista ordenada por prioridad.
+
+```python
+cola = ["PED-10021", "PED-10007", "PED-10044", "PED-10012", "PED-10033", "PED-10008"]
+```
+
+**Se pide:**
+
+1. Invierte la cola usando *slicing* con paso negativo (sin `.reverse()`) y guárdala en `cola_invertida`.
+2. Ordena `cola` alfabéticamente con `sorted()` **sin modificar la original** y comprueba que la original sigue intacta.
+3. Ordena ahora la lista **en sitio** con `.sort(reverse=True)`.
+4. Atiende los dos primeros pedidos: extráelos con `.pop(0)` y guárdalos en `atendidos`.
+5. Inserta un pedido urgente `"PED-99999"` al principio de la cola.
+6. Imprime un informe final con el número de pedidos atendidos, los pendientes y el porcentaje de avance redondeado a un decimal.
+
+cola = ["PED-10021", "PED-10007", "PED-10044", "PED-10012", "PED-10033", "PED-10008"]
+
+# 1. Invertir usando slicing
+cola_invertida = cola[::-1]
+print("Cola invertida:", cola_invertida)
+
+# 2. Ordenar con sorted() sin modificar la original
+cola_ordenada = sorted(cola)
+print("Cola ordenada:", cola_ordenada)
+print("Cola original:", cola)
+
+# 3. Ordenar la lista en sitio de forma descendente
+cola.sort(reverse=True)
+print("Cola después de sort:", cola)
+
+# 4. Atender los dos primeros pedidos
+atendidos = []
+atendidos.append(cola.pop(0))
+atendidos.append(cola.pop(0))
+
+# 5. Insertar pedido urgente al principio
+cola.insert(0, "PED-99999")
+
+# 6. Informe final
+total_pedidos = len(atendidos) + len(cola)
+porcentaje_avance = (len(atendidos) / total_pedidos) * 100
+
+print("\n--- INFORME FINAL ---")
+print("Pedidos atendidos:", len(atendidos))
+print("Pedidos pendientes:", cola)
+print("Porcentaje de avance:", round(porcentaje_avance, 1), "%")
+
+### Ejercicio 5 — Funciones propias para el cálculo de importes
+
+**Se pide:**
+
+1. Define la función `calcular_importe(unidades, precio_unitario, descuento_pct=0)` que devuelva el importe neto redondeado a dos decimales. El parámetro `descuento_pct` debe tener valor por defecto.
+2. Define `resumen_pedido(unidades, precio_unitario, descuento_pct=0)` que devuelva **una tupla de tres elementos**: `(importe_bruto, ahorro, importe_neto)`.
+3. Llama a `resumen_pedido` usando **argumentos por palabra clave** y desempaqueta el resultado en tres variables.
+4. Documenta ambas funciones con *docstring* y muestra la ayuda con `help(calcular_importe)`.
+5. Usa `max()`, `min()`, `sorted()` y `len()` sobre la lista `importes` que obtengas al aplicar `calcular_importe` a estos cinco pedidos:
+    
+    ```python
+    pedidos = [
+        (3, 59.90, 10),
+        (1, 279.00, 0),
+        (5, 18.50, 20),
+        (2, 149.00, 5),
+        (4, 89.90, 15),
+    ]
+    ```
+    
+    **Comprobación:** `calcular_importe(3, 59.90, 10)` debe devolver `161.73`.
+
+# 1. Función para calcular el importe neto
+def calcular_importe(unidades, precio_unitario, descuento_pct=0):
+    """
+    Calcula el importe neto de un pedido aplicando un descuento.
+    
+    Parámetros:
+        unidades: número de unidades del pedido.
+        precio_unitario: precio de cada unidad.
+        descuento_pct: porcentaje de descuento. Por defecto es 0.
+    
+    Devuelve:
+        El importe neto redondeado a dos decimales.
+    """
+    importe_bruto = unidades * precio_unitario
+    descuento = importe_bruto * descuento_pct / 100
+    importe_neto = importe_bruto - descuento
+    
+    return round(importe_neto, 2)
+
+
+# 2. Función que devuelve el resumen del pedido
+def resumen_pedido(unidades, precio_unitario, descuento_pct=0):
+    """
+    Devuelve un resumen de un pedido con importe bruto, ahorro e importe neto.
+    
+    Parámetros:
+        unidades: número de unidades del pedido.
+        precio_unitario: precio de cada unidad.
+        descuento_pct: porcentaje de descuento. Por defecto es 0.
+    
+    Devuelve:
+        Una tupla con (importe_bruto, ahorro, importe_neto).
+    """
+    importe_bruto = unidades * precio_unitario
+    ahorro = importe_bruto * descuento_pct / 100
+    importe_neto = importe_bruto - ahorro
+    
+    return (round(importe_bruto, 2), round(ahorro, 2), round(importe_neto, 2))
+
+
+# 3. Llamada usando argumentos por palabra clave y desempaquetado
+importe_bruto, ahorro, importe_neto = resumen_pedido(
+    unidades=3,
+    precio_unitario=59.90,
+    descuento_pct=10
+)
+
+print("Importe bruto:", importe_bruto)
+print("Ahorro:", ahorro)
+print("Importe neto:", importe_neto)
+
+
+# 4. Mostrar la ayuda de la función
+help(calcular_importe)
+
+
+# 5. Lista de pedidos
+pedidos = [
+    (3, 59.90, 10),
+    (1, 279.00, 0),
+    (5, 18.50, 20),
+    (2, 149.00, 5),
+    (4, 89.90, 15),
+]
+
+# Aplicar calcular_importe a cada pedido
+importes = []
+
+for pedido in pedidos:
+    unidades, precio_unitario, descuento_pct = pedido
+    importe = calcular_importe(unidades, precio_unitario, descuento_pct)
+    importes.append(importe)
+
+print("\nImportes:", importes)
+
+# Usar max(), min(), sorted() y len()
+print("Importe máximo:", max(importes))
+print("Importe mínimo:", min(importes))
+print("Importes ordenados:", sorted(importes))
+print("Número de pedidos:", len(importes))
+
+
+### Ejercicio 6 — Normalización de códigos SKU con métodos
+
+El equipo de logística recibe códigos de producto en formatos inconsistentes.
+
+```python
+skus_crudos = [
+    "  elc-0012-es ", "HOG-0045-ES", "dep-0003-pt  ",
+    "ofi-0021-es", "  ELC-0012-ES", "hog-0099-fr ",
+]
+```
+
+**Se pide:**
+
+1. Crea `skus_limpios` aplicando a cada código: eliminación de espacios sobrantes (`.strip()`) y conversión a mayúsculas (`.upper()`).
+2. Cuenta cuántas veces aparece `"ELC-0012-ES"` en la lista limpia con `.count()`.
+3. Obtén la posición de la primera aparición de `"OFI-0021-ES"` con `.index()`.
+4. Para cada SKU limpio, usa `.split("-")` para separar familia, número y país. Construye una lista de listas con esas tres partes.
+5. Crea `skus_es` con solo los SKU cuyo país sea `"ES"` y sustituye en todos ellos el guion por un punto con `.replace()`.
+6. Genera una cadena única separada por `" | "` usando `.join()` y muéstrala.
+
+> **Pista:** `.strip()`, `.upper()` y `.replace()` **devuelven** una nueva cadena; no modifican la original. `.append()` y `.sort()` sobre listas, en cambio, actúan en sitio y devuelven `None`.
+>skus_crudos = [
+    "  elc-0012-es ", "HOG-0045-ES", "dep-0003-pt  ",
+    "ofi-0021-es", "  ELC-0012-ES", "hog-0099-fr ",
+]
+
+# 1. Limpiar los SKU: quitar espacios y convertir a mayúsculas
+skus_limpios = []
+
+for sku in skus_crudos:
+    sku_limpio = sku.strip().upper()
+    skus_limpios.append(sku_limpio)
+
+print("SKUs limpios:", skus_limpios)
+
+
+# 2. Contar cuántas veces aparece ELC-0012-ES
+cantidad_elc = skus_limpios.count("ELC-0012-ES")
+
+print("Veces que aparece ELC-0012-ES:", cantidad_elc)
+
+
+# 3. Obtener la posición de OFI-0021-ES
+posicion_ofi = skus_limpios.index("OFI-0021-ES")
+
+print("Posición de OFI-0021-ES:", posicion_ofi)
+
+
+# 4. Separar cada SKU en familia, número y país
+skus_separados = []
+
+for sku in skus_limpios:
+    partes = sku.split("-")
+    skus_separados.append(partes)
+
+print("SKUs separados:", skus_separados)
+
+
+# 5. Obtener solo los SKU de España y sustituir - por .
+skus_es = []
+
+for sku in skus_limpios:
+    partes = sku.split("-")
+    
+    if partes[2] == "ES":
+        sku_es = sku.replace("-", ".")
+        skus_es.append(sku_es)
+
+print("SKUs de España:", skus_es)
+
+
+# 6. Crear una cadena única usando join()
+cadena_skus = " | ".join(skus_es)
+
+print("Cadena final:", cadena_skus)
+### Ejercicio 8 — Del cálculo con listas al cálculo vectorizado
+
+```python
+unidades = [3, 1, 5, 2, 4, 6, 2, 8, 3, 1]
+precios  = [59.90, 279.00, 18.50, 149.00, 89.90, 27.50, 219.00, 14.90, 64.00, 239.00]
+
+```
+
+**Se pide:**
+
+1. Intenta calcular `unidades * precios` con las listas de Python y explica en una frase el resultado o el error obtenido.
+2. Convierte ambas listas a arrays NumPy (`np_unidades`, `np_precios`) e imprime `dtype` y `shape` de cada uno.
+3. Calcula el array `importes = np_unidades * np_precios` y su suma total.
+4. Aplica un recargo logístico del 4 % a todos los importes con una única operación vectorizada.
+5. Crea un array mixto a partir de `[1, "dos", 3.0, True]` y explica qué `dtype` resulta y por qué NumPy fuerza la homogeneidad de tipos.
+6. Compara el tiempo de calcular los importes con un bucle `for` frente a la versión vectorizada usando `%timeit` en una celda mágica de JupyterLab.
+
+**Comprobación:** la suma de `importes` debe ser 2 362,00 € y hay 4 productos con precio unitario superior a 100 €.
+import numpy as np
+
+unidades = [3, 1, 5, 2, 4, 6, 2, 8, 3, 1]
+precios  = [59.90, 279.00, 18.50, 149.00, 89.90, 27.50, 219.00, 14.90, 64.00, 239.00]
+
+
+# 1. Intentar multiplicar listas de Python
+try:
+    resultado = unidades * precios
+    print(resultado)
+except TypeError as e:
+    print("Error:", e)
+
+# Las listas de Python no permiten multiplicar elemento a elemento.
+# El operador * con una lista solo permite multiplicarla por un entero.
+
+
+# 2. Convertir las listas a arrays NumPy
+np_unidades = np.array(unidades)
+np_precios = np.array(precios)
+
+print("dtype unidades:", np_unidades.dtype)
+print("shape unidades:", np_unidades.shape)
+
+print("dtype precios:", np_precios.dtype)
+print("shape precios:", np_precios.shape)
+
+
+# 3. Calcular los importes y la suma total
+importes = np_unidades * np_precios
+
+print("Importes:", importes)
+print("Suma total:", importes.sum())
+
+
+# 4. Aplicar un recargo logístico del 4 %
+importes_con_recargo = importes * 1.04
+
+print("Importes con recargo:", importes_con_recargo)
+
+
+# 5. Array mixto
+array_mixto = np.array([1, "dos", 3.0, True])
+
+print("Array mixto:", array_mixto)
+print("dtype array mixto:", array_mixto.dtype)
+
+# NumPy fuerza todos los elementos al mismo tipo.
+# En este caso los convierte a cadenas porque hay un elemento de tipo str.
+
+
+# 6. Comparación de tiempos con %timeit
+
+# Versión con bucle for
+def calcular_con_for():
+    resultado = []
+    for i in range(len(unidades)):
+        resultado.append(unidades[i] * precios[i])
+    return resultado
+
+# Versión vectorizada
+def calcular_vectorizado():
+    return np_unidades * np_precios
+### Ejercicio 9 — Subsetting con máscaras booleanas
+
+Partiendo de los arrays `np_unidades`, `np_precios` e `importes` del ejercicio anterior:
+
+**Se pide:**
+
+1. Crea la máscara booleana `caros = np_precios > 100` e imprímela. Observa que es un array de `True` y `False` con la misma longitud que `np_precios`.
+2. Usa la máscara para extraer los precios que superan 100 €: `np_precios[caros]`.
+3. Cuenta cuántos productos caros hay con `caros.sum()` y explica en una frase por qué sumar booleanos devuelve un número.
+4. Aplica la **misma máscara** al array `importes` para obtener los importes de esas líneas. Calcula su suma.
+5. Obtén las posiciones que cumplen la condición con `np.where(caros)`.
+6. Crea una segunda máscara `varias = np_unidades >= 2` y combina ambas con `&`, recordando que cada condición va entre paréntesis:
+   ```python
+   seleccion = (np_precios > 100) & (np_unidades >= 2)
+   print(importes[seleccion])
+
+   ```
+import numpy as np
+
+unidades = [3, 1, 5, 2, 4, 6, 2, 8, 3, 1]
+precios = [59.90, 279.00, 18.50, 149.00, 89.90, 27.50, 219.00, 14.90, 64.00, 239.00]
+
+np_unidades = np.array(unidades)
+np_precios = np.array(precios)
+
+importes = np_unidades * np_precios
+
+
+# 1. Crear máscara de productos caros
+caros = np_precios > 100
+
+print("Máscara caros:")
+print(caros)
+
+
+# 2. Extraer los precios superiores a 100 €
+print("Precios superiores a 100 €:")
+print(np_precios[caros])
+
+
+# 3. Contar productos caros
+cantidad_caros = caros.sum()
+
+print("Número de productos caros:", cantidad_caros)
+
+# Los booleanos se comportan como números:
+# True = 1 y False = 0.
+# Por eso, al sumarlos obtenemos el número de True.
+
+
+# 4. Obtener los importes de los productos caros
+importes_caros = importes[caros]
+
+print("Importes de productos caros:")
+print(importes_caros)
+
+print("Suma de importes caros:", importes_caros.sum())
+
+
+# 5. Obtener las posiciones que cumplen la condición
+posiciones = np.where(caros)
+
+print("Posiciones:", posiciones)
+
+
+# 6. Combinar las dos condiciones
+varias = np_unidades >= 2
+
+seleccion = (np_precios > 100) & (np_unidades >= 2)
+
+print("Máscara varias:", varias)
+print("Selección:", seleccion)
+
+print("Importes seleccionados:")
+print(importes[seleccion])
+### Ejercicio 10 — Matriz de ventas por trimestre y región
+
+```python
+import numpy as np
+
+# Filas: T1, T2, T3  |  Columnas: Norte, Sur, Este, Oeste, Centro
+ventas_2d = np.array([
+    [15200.50, 11800.25, 12950.00,  9870.40, 13400.10],
+    [16840.75, 12310.60, 13480.90, 11020.35, 14100.80],
+    [12535.72, 10663.06, 11221.59, 12673.08, 12334.38],
+])
+
+```
+
+**Se pide:**
+
+1. Imprime `shape`, `ndim` y `size` del array y explica qué representa cada uno en este contexto de negocio.
+2. Extrae la fila del segundo trimestre y la columna de la región Centro.
+3. Obtén el valor de T3 en la región Este mediante indexación 2D.
+4. Extrae con *slicing* la submatriz de T1 y T2 para las tres primeras regiones.
+5. Calcula el total por trimestre (`axis=1`) y el total por región (`axis=0`).
+6. Aplica una previsión de crecimiento del 6 % a T3 sumando el resultado como una **cuarta fila** con `np.vstack()`.
+7. Identifica la región con mayor facturación acumulada usando `np.argmax()` sobre los totales por región, y traduce el índice a nombre con una lista de etiquetas.
+import numpy as np
+
+# Filas: T1, T2, T3
+# Columnas: Norte, Sur, Este, Oeste, Centro
+
+ventas_2d = np.array([
+    [15200.50, 11800.25, 12950.00,  9870.40, 13400.10],
+    [16840.75, 12310.60, 13480.90, 11020.35, 14100.80],
+    [12535.72, 10663.06, 11221.59, 12673.08, 12334.38],
+])
+
+regiones = ["Norte", "Sur", "Este", "Oeste", "Centro"]
+trimestres = ["T1", "T2", "T3"]
+
+
+# 1. Shape, ndim y size
+print("Shape:", ventas_2d.shape)
+print("Ndim:", ventas_2d.ndim)
+print("Size:", ventas_2d.size)
+
+# shape = (3, 5): 3 trimestres y 5 regiones.
+# ndim = 2: es un array bidimensional.
+# size = 15: hay 15 valores de ventas en total.
+
+
+# 2. Fila del segundo trimestre y columna Centro
+t2 = ventas_2d[1]
+centro = ventas_2d[:, 4]
+
+print("Ventas T2:", t2)
+print("Ventas Centro:", centro)
+
+
+# 3. Valor de T3 en la región Este
+t3_este = ventas_2d[2, 2]
+
+print("T3 - Este:", t3_este)
+
+
+# 4. Submatriz de T1 y T2 para las tres primeras regiones
+submatriz = ventas_2d[0:2, 0:3]
+
+print("Submatriz T1-T2, Norte-Sur-Este:")
+print(submatriz)
+
+
+# 5. Totales por trimestre y por región
+total_trimestre = ventas_2d.sum(axis=1)
+total_region = ventas_2d.sum(axis=0)
+
+print("Total por trimestre:", total_trimestre)
+print("Total por región:", total_region)
+
+
+# 6. Previsión de crecimiento del 6 % para T3
+prevision_t4 = ventas_2d[2] * 1.06
+
+ventas_con_prevision = np.vstack([ventas_2d, prevision_t4])
+
+print("Previsión del 6 %:")
+print(prevision_t4)
+
+print("Matriz con previsión:")
+print(ventas_con_prevision)
+
+
+# 7. Región con mayor facturación acumulada
+indice_max = np.argmax(total_region)
+region_max = regiones[indice_max]
+
+print("Región con mayor facturación:", region_max)
+print("Índice:", indice_max)
+print("Facturación acumulada:", total_region[indice_max])
+### Ejercicio 11 — Estadística descriptiva sobre telemetría simulada
+
+**Se pide:**
+
+1. Genera con `rng = np.random.default_rng(2024)` dos arrays de 500 elementos: `temperatura` con `rng.normal(68, 6.5, 500)` y `vibracion` con `np.abs(rng.normal(2.4, 0.8, 500))`.
+2. Calcula media, mediana, desviación típica, mínimo y máximo de `temperatura`. Compara media y mediana y razona en una frase qué indica la diferencia.
+3. Calcula los percentiles 25, 50, 75 y 95 de `vibracion` con `np.percentile()`.
+4. Apila ambos arrays en una matriz de forma `(500, 2)` con `np.column_stack()` y verifica el `shape`.
+5. Calcula la matriz de correlación con `np.corrcoef()` y explica en una frase si existe relación lineal entre temperatura y vibración en estos datos simulados.
+6. Define `umbral = media + 2 * desviación` de la temperatura, cuenta cuántas lecturas lo superan y calcula qué porcentaje del total representan.
+7. Explica en dos frases por qué fijar la semilla (`default_rng(2024)`) es imprescindible para que un análisis sea reproducible por un tercero.
+import numpy as np
+
+
+# 1. Generar los datos
+rng = np.random.default_rng(2024)
+
+temperatura = rng.normal(68, 6.5, 500)
+vibracion = np.abs(rng.normal(2.4, 0.8, 500))
+
+
+# 2. Estadística descriptiva de temperatura
+media = np.mean(temperatura)
+mediana = np.median(temperatura)
+desviacion = np.std(temperatura)
+minimo = np.min(temperatura)
+maximo = np.max(temperatura)
+
+print("Media:", media)
+print("Mediana:", mediana)
+print("Desviación típica:", desviacion)
+print("Mínimo:", minimo)
+print("Máximo:", maximo)
+
+# La media y la mediana son muy próximas, lo que indica
+# que la distribución de temperaturas es bastante simétrica
+# y no presenta una asimetría importante.
+
+
+# 3. Percentiles de vibración
+percentiles = np.percentile(vibracion, [25, 50, 75, 95])
+
+print("\nPercentiles de vibración:")
+print("P25:", percentiles[0])
+print("P50:", percentiles[1])
+print("P75:", percentiles[2])
+print("P95:", percentiles[3])
+
+
+# 4. Crear matriz (500, 2)
+telemetria = np.column_stack((temperatura, vibracion))
+
+print("\nShape de la matriz:", telemetria.shape)
+
+
+# 5. Matriz de correlación
+correlacion = np.corrcoef(temperatura, vibracion)
+
+print("\nMatriz de correlación:")
+print(correlacion)
+
+# La correlación es aproximadamente 0.0067, por lo que
+# prácticamente no existe relación lineal entre temperatura y vibración.
+
+
+# 6. Umbral = media + 2 desviaciones
+umbral = media + 2 * desviacion
+
+lecturas_superan = np.sum(temperatura > umbral)
+porcentaje = (lecturas_superan / len(temperatura)) * 100
+
+print("\nUmbral:", umbral)
+print("Lecturas que superan el umbral:", lecturas_superan)
+print("Porcentaje:", porcentaje, "%")
+
+
+# 7. La semilla permite obtener exactamente los mismos números
+# aleatorios cada vez que se ejecuta el código.
+# Esto permite que otra persona pueda reproducir el análisis
+# y obtener exactamente los mismos resultados.
+### Ejercicio 12 — Diccionarios simples y anidados
+
+**Se pide:**
+
+1. Crea el diccionario `tarifas_envio` con estos pares: `Norte: 4.95`, `Sur: 5.50`, `Este: 5.20`, `Oeste: 6.10`, `Centro: 3.90`.
+2. Accede a la tarifa de `"Este"` e imprímela.
+3. Añade la región `"Insular"` con tarifa `9.80` y actualiza `"Oeste"` a `5.95`.
+4. Elimina `"Sur"` con `del` y comprueba con el operador `in` que ya no existe.
+5. Recorre el diccionario con `.items()` e imprime una línea por región con formato `Norte -> 4.95 €`.
+6. Construye el diccionario **anidado** `red_logistica` donde cada región sea una clave y su valor otro diccionario con las claves `almacen`, `tarifa` y `entrega_h`:
+   ```python
+   red_logistica = {
+       "Norte":  {"almacen": "ALM-NORTE", "tarifa": 4.95, "entrega_h": 24},
+       "Este":   {"almacen": "ALM-ESTE",  "tarifa": 5.20, "entrega_h": 48},
+       "Centro": {"almacen": "ALM-CENTRO","tarifa": 3.90, "entrega_h": 24},
+   }
+
+   ```
+7. Accede al tiempo de entrega del almacén del Este mediante doble clave.
+8. Añade la región `"Oeste"` completa al diccionario anidado y recorre toda la estructura con un bucle anidado para imprimir un informe legible.
+9. Explica en dos frases cuándo conviene un diccionario frente a una lista, en términos de acceso y de significado de la clave.
+# 1. Crear el diccionario de tarifas
+tarifas_envio = {
+    "Norte": 4.95,
+    "Sur": 5.50,
+    "Este": 5.20,
+    "Oeste": 6.10,
+    "Centro": 3.90
+}
+
+
+# 2. Acceder a la tarifa de Este
+print("Tarifa Este:", tarifas_envio["Este"], "€")
+
+
+# 3. Añadir Insular y actualizar Oeste
+tarifas_envio["Insular"] = 9.80
+tarifas_envio["Oeste"] = 5.95
+
+
+# 4. Eliminar Sur y comprobar que ya no existe
+del tarifas_envio["Sur"]
+
+print("¿Existe Sur?", "Sur" in tarifas_envio)
+
+
+# 5. Recorrer el diccionario con items()
+for region, tarifa in tarifas_envio.items():
+    print(f"{region} -> {tarifa:.2f} €")
+
+
+# 6. Crear diccionario anidado
+red_logistica = {
+    "Norte": {
+        "almacen": "ALM-NORTE",
+        "tarifa": 4.95,
+        "entrega_h": 24
+    },
+    "Este": {
+        "almacen": "ALM-ESTE",
+        "tarifa": 5.20,
+        "entrega_h": 48
+    },
+    "Centro": {
+        "almacen": "ALM-CENTRO",
+        "tarifa": 3.90,
+        "entrega_h": 24
+    }
+}
+
+
+# 7. Acceder al tiempo de entrega del Este
+print("\nEntrega Este:", red_logistica["Este"]["entrega_h"], "horas")
+
+
+# 8. Añadir Oeste completo
+red_logistica["Oeste"] = {
+    "almacen": "ALM-OESTE",
+    "tarifa": 5.95,
+    "entrega_h": 36
+}
+
+
+# Recorrer la estructura con un bucle anidado
+print("\n--- INFORME LOGÍSTICO ---")
+
+for region, datos in red_logistica.items():
+    print(f"\nRegión: {region}")
+    
+    for clave, valor in datos.items():
+        print(f"  {clave}: {valor}")
+
+
+# 9. Un diccionario conviene cuando necesitamos acceder a los datos
+# mediante una clave con significado, por ejemplo "Este", en lugar
+# de depender de una posición numérica.
+# Una lista conviene cuando los elementos forman una colección ordenada
+# y normalmente accedemos a ellos mediante su posición o índice.
+### Ejercicio 13 — De diccionario a DataFrame y lectura de CSV
+
+**Se pide:**
+
+1. Construye este diccionario y conviértelo en un DataFrame llamado `almacenes` con `pd.DataFrame()`:
+   ```python
+   almacenes = {
+       "codigo":    ["ALM-NORTE", "ALM-SUR", "ALM-ESTE", "ALM-OESTE", "ALM-CENTRO"],
+       "ciudad":    ["Bilbao", "Sevilla", "Valencia", "Vigo", "Madrid"],
+       "m2":        [4200, 3100, 3800, 2600, 6500],
+       "operarios": [48, 31, 39, 22, 74],
+   }
+
+   ```
+2. Imprime el DataFrame y observa el índice numérico que pandas ha creado automáticamente.
+3. Convierte la columna `codigo` en índice con `.set_index("codigo")` y vuelve a imprimirlo.
+4. Carga los tres ficheros CSV:
+   ```python
+   ventas = pd.read_csv("../data/ventas_retail.csv")
+   empleados = pd.read_csv("../data/empleados.csv", index_col="id_empleado")
+   sensores = pd.read_csv("../data/sensores_planta.csv")
+
+   ```
+5. Para `ventas`, muestra `head(8)`, `tail(3)` y `shape`.
+6. Ejecuta `ventas.info()` e identifica qué columnas son numéricas y cuáles de texto.
+7. Cuenta los valores ausentes por columna con `ventas.isna().sum()` e indica en una frase en qué columnas se concentran.
+8. Imprime el `shape` de los tres DataFrames.
+
+**Comprobación:** `ventas` debe tener 420 filas; `empleados`, 180; `sensores`, 600.
+import pandas as pd
+
+# 1. Crear el diccionario
+almacenes = {
+    "codigo": ["ALM-NORTE", "ALM-SUR", "ALM-ESTE", "ALM-OESTE", "ALM-CENTRO"],
+    "ciudad": ["Bilbao", "Sevilla", "Valencia", "Vigo", "Madrid"],
+    "m2": [4200, 3100, 3800, 2600, 6500],
+    "operarios": [48, 31, 39, 22, 74]
+}
+
+# Convertir a DataFrame
+almacenes = pd.DataFrame(almacenes)
+
+# 2. Imprimir el DataFrame
+print(almacenes)
+
+# 3. Convertir codigo en índice
+almacenes = almacenes.set_index("codigo")
+print(almacenes)
+
+
+# 4. Cargar los CSV
+ventas = pd.read_csv("../data/ventas_retail.csv")
+empleados = pd.read_csv("../data/empleados.csv", index_col="id_empleado")
+sensores = pd.read_csv("../data/sensores_planta.csv")
+
+
+# 5. Mostrar primeras 8, últimas 3 filas y dimensiones
+print(ventas.head(8))
+print(ventas.tail(3))
+print(ventas.shape)
+
+
+# 6. Información del DataFrame
+ventas.info()
+
+
+# 7. Valores ausentes por columna
+print(ventas.isna().sum())
+
+
+# 8. Shape de los tres DataFrames
+print("Ventas:", ventas.shape)
+print("Empleados:", empleados.shape)
+print("Sensores:", sensores.shape)
+
+Ejercicio 14 — Selección con corchetes, loc e iloc
+
+Trabaja sobre el DataFrame empleados con id_empleado como índice.
+
+Se pide:
+
+Selecciona la columna salario_base como Serie y como DataFrame. Muestra el type() de cada resultado.
+Selecciona las columnas departamento, ciudad y salario_base a la vez.
+Extrae las filas de la 10 a la 15 (ambas incluidas en la posición) usando corchetes con slicing.
+Con loc, obtén la fila completa del empleado EMP-1042.
+Con loc, obtén el departamento y la modalidad de los empleados EMP-1005, EMP-1020 y EMP-1099.
+Con iloc, obtén las tres primeras filas y las columnas en posición 2 y 5.
+Con loc, selecciona todas las filas y solo las columnas nombre y bonus_pct.
+Explica en una tabla Markdown de tres filas la diferencia entre corchetes, loc e iloc, indicando si trabajan por etiqueta o por posición.
+# 1. Seleccionar salario_base como Serie y como DataFrame
+
+salario_serie = empleados["salario_base"]
+print(salario_serie)
+print(type(salario_serie))
+
+salario_dataframe = empleados[["salario_base"]]
+print(salario_dataframe)
+print(type(salario_dataframe))
+
+
+# 2. Seleccionar varias columnas
+
+seleccion = empleados[["departamento", "ciudad", "salario_base"]]
+print(seleccion)
+
+
+# 3. Filas de la posición 10 a la 15, ambas incluidas
+# En slicing con corchetes, el límite final se incluye en este caso
+
+print(empleados[10:16])
+
+
+# 4. Fila completa del empleado EMP-1042
+
+print(empleados.loc["EMP-1042"])
+
+
+# 5. Departamento y modalidad de varios empleados
+
+print(
+    empleados.loc[
+        ["EMP-1005", "EMP-1020", "EMP-1099"],
+        ["departamento", "modalidad"]
+    ]
+)
+
+
+# 6. Tres primeras filas y columnas en posición 2 y 5
+
+print(empleados.iloc[:3, [2, 5]])
+
+
+# 7. Todas las filas y solo nombre y bonus_pct
+
+print(empleados.loc[:, ["nombre", "bonus_pct"]])
+https://chatgpt.com/share/6aac6def-9890-83eb-9e78-32db611d982c
+Ejercicio 15 — Columnas calculadas, agregación y exportación
+
+Trabaja sobre ventas.
+
+Se pide:
+
+Crea la columna importe_bruto = unidades * precio_unitario.
+Crea la columna importe_neto aplicando descuento_pct, redondeada a dos decimales.
+Crea la columna ticket_medio = importe_neto / unidades.
+Agrupa por region y calcula la suma de importe_neto, ordenada de mayor a menor.
+Agrupa por categoria y canal a la vez, y calcula importe_neto medio y unidades totales usando .agg() con un diccionario de funciones.
+Obtén el top 5 de productos por facturación neta con .groupby(), .sum() y .nlargest().
+Rellena los nulos de satisfaccion con la mediana de la columna y los de canal con el texto "Desconocido".
+Exporta el resultado agrupado por región a ../outputs/facturacion_por_region.csv.
+
+Comprobación: la facturación neta total debe ser 190 402,48 € y la región líder, Norte.
+# 1. Crear importe_bruto
+ventas["importe_bruto"] = ventas["unidades"] * ventas["precio_unitario"]
+
+
+# 2. Crear importe_neto aplicando el descuento
+ventas["importe_neto"] = (
+    ventas["importe_bruto"] * (1 - ventas["descuento_pct"] / 100)
+).round(2)
+
+
+# 3. Crear ticket_medio
+ventas["ticket_medio"] = (
+    ventas["importe_neto"] / ventas["unidades"]
+).round(2)
+
+
+# 4. Agrupar por región y sumar importe_neto
+facturacion_region = (
+    ventas.groupby("region")["importe_neto"]
+    .sum()
+    .sort_values(ascending=False)
+)
+
+print(facturacion_region)
+
+
+# 5. Agrupar por categoria y canal
+resumen_categoria_canal = (
+    ventas.groupby(["categoria", "canal"])
+    .agg({
+        "importe_neto": "mean",
+        "unidades": "sum"
+    })
+)
+
+print(resumen_categoria_canal)
+
+
+# 6. Top 5 productos por facturación neta
+top_5_productos = (
+    ventas.groupby("producto")["importe_neto"]
+    .sum()
+    .nlargest(5)
+)
+
+print(top_5_productos)
+
+
+# 7. Rellenar valores nulos
+ventas["satisfaccion"] = ventas["satisfaccion"].fillna(
+    ventas["satisfaccion"].median()
+)
+
+ventas["canal"] = ventas["canal"].fillna("Desconocido")
+
+
+# 8. Exportar facturación por región
+facturacion_region.to_csv(
+    "../outputs/facturacion_por_region.csv"
+)
+Ejercicio 16 — Operadores de comparación y booleanos
+
+Se pide:
+
+Evalúa e imprime el resultado de estas expresiones, razonando una frase por cada una:
+print(2 < 3)
+print("Norte" == "norte")
+print(True + True + False)
+print(3 != 3.0)
+print("Zapatilla" > "Mochila")
+
+Define unidades = 6, precio = 149.0 y descuento = 15. Construye una expresión booleana que sea True solo si el pedido tiene más de 4 unidades y un descuento mayor o igual a 10.
+Construye otra que sea True si el precio es inferior a 50 o superior a 200.
+Aplica not a la expresión del punto 2 e interpreta el resultado en lenguaje de negocio.
+Crea los arrays temp = np.array([64.2, 88.1, 71.0, 92.5, 69.8]) y vib = np.array([1.9, 3.4, 2.1, 4.0, 2.2]).
+Intenta ejecutar temp > 70 and vib > 3 y explica el ValueError que se produce.
+Resuélvelo con np.logical_and() y también con la sintaxis (temp > 70) & (vib > 3), comprobando que el resultado es idéntico.
+import numpy as np
+
+# 1. Expresiones booleanas
+
+print(2 < 3)
+# True → 2 es menor que 3
+
+print("Norte" == "norte")
+# False → Python distingue entre mayúsculas y minúsculas
+
+print(True + True + False)
+# 2 → True equivale a 1 y False equivale a 0
+
+print(3 != 3.0)
+# False → 3 y 3.0 tienen el mismo valor numérico
+
+print("Zapatilla" > "Mochila")
+# True → se comparan alfabéticamente y "Z" aparece después de "M"
+
+
+# 2. Más de 4 unidades Y descuento >= 10
+
+unidades = 6
+precio = 149.0
+descuento = 15
+
+condicion = unidades > 4 and descuento >= 10
+print(condicion)
+# True
+
+
+# 3. Precio inferior a 50 O superior a 200
+
+condicion_precio = precio < 50 or precio > 200
+print(condicion_precio)
+# False
+
+
+# 4. Aplicar not a la expresión del punto 2
+
+print(not condicion)
+# False
+# Significa que el pedido SÍ cumple las dos condiciones.
+
+
+# 5. Crear arrays NumPy
+
+temp = np.array([64.2, 88.1, 71.0, 92.5, 69.8])
+vib = np.array([1.9, 3.4, 2.1, 4.0, 2.2])
+
+
+# 6. Esto produce un ValueError
+
+# temp > 70 and vib > 3
+
+# ValueError: The truth value of an array with more than one element is ambiguous.
+#
+# "and" necesita evaluar un único True o False,
+# pero las comparaciones con NumPy devuelven arrays de booleanos.
+
+
+# 7. Solución con np.logical_and()
+
+resultado1 = np.logical_and(temp > 70, vib > 3)
+print(resultado1)
+
+
+# Solución con &
+
+resultado2 = (temp > 70) & (vib > 3)
+print(resultado2)
+
+
+# Comprobar que son idénticos
+
+print(np.array_equal(resultado1, resultado2))
+# True
+Ejercicio 17 — if / elif / else aplicado a mantenimiento predictivo
+
+Se pide:
+
+Escribe la función nivel_riesgo(temperatura) que reciba una temperatura y devuelva:
+"CRÍTICO" si supera 85 °C
+"ALTO" si es mayor que 76 °C
+"MEDIO" si es mayor que 70 °C
+"BAJO" en cualquier otro caso
+def nivel_riesgo(temperatura):
+    if temperatura > 85:
+        return "CRÍTICO"
+    elif temperatura > 76:
+        return "ALTO"
+    elif temperatura > 70:
+        return "MEDIO"
+    else:
+        return "BAJO"
+
+Prueba la función con estos cuatro valores y comprueba que cada uno cae en una rama distinta: 92.5, 80.0, 72.3, 64.1.
+Aplica la función a la columna de temperatura del DataFrame sensores para crear la columna riesgo. Pasa el nombre de la función, sin paréntesis:
+sensores["riesgo"] = sensores["temperatura_c"].apply(nivel_riesgo)
+print(sensores[["id_maquina", "temperatura_c", "riesgo"]].head())
+
+Cuenta cuántas lecturas hay de cada nivel con sensores["riesgo"].value_counts().
+Filtra las lecturas con riesgo "CRÍTICO" y averigua qué máquina acumula más, usando value_counts() sobre la columna id_maquina del resultado filtrado.
+Escribe una celda Markdown con una recomendación de negocio de dos líneas basada en lo observado.
+
+Comprobación: el fichero contiene 20 lecturas con estado igual a ALARMA y 72 con AVISO.
+# 1. Crear la función nivel_riesgo()
+
+def nivel_riesgo(temperatura):
+    if temperatura > 85:
+        return "CRÍTICO"
+    elif temperatura > 76:
+        return "ALTO"
+    elif temperatura > 70:
+        return "MEDIO"
+    else:
+        return "BAJO"
+
+
+# 2. Probar la función
+
+print(nivel_riesgo(92.5))  # CRÍTICO
+print(nivel_riesgo(80.0))  # ALTO
+print(nivel_riesgo(72.3))  # MEDIO
+print(nivel_riesgo(64.1))  # BAJO
+
+
+# 3. Aplicar la función a la columna de temperatura
+
+sensores["riesgo"] = sensores["temperatura_c"].apply(nivel_riesgo)
+
+print(
+    sensores[["id_maquina", "temperatura_c", "riesgo"]].head()
+)
+
+
+# 4. Contar cuántas lecturas hay de cada nivel
+
+print(sensores["riesgo"].value_counts())
+
+
+# 5. Filtrar las lecturas CRÍTICAS
+
+criticos = sensores[sensores["riesgo"] == "CRÍTICO"]
+
+print(criticos)
+
+
+# Averiguar qué máquina acumula más lecturas críticas
+
+maquinas_criticas = criticos["id_maquina"].value_counts()
+
+print(maquinas_criticas)
+print(maquinas_criticas.idxmax())
+
+
+# 6. Recomendación de negocio
+Ejercicio 19 — Bucles sobre estructuras de datos
+
+Se pide:
+
+while****: simula la reposición de stock. Partiendo de stock = 12 y un objetivo de 60 unidades, añade lotes de 8 unidades e imprime en cada vuelta el número de lote y el stock resultante. El bucle termina al alcanzar o superar el objetivo.
+stock = 12
+lote = 0
+
+while stock < 60:
+    lote = lote + 1
+    stock = stock + 8
+    print("Lote", lote, "-> stock:", stock)
+
+for sobre lista: recorre ["Norte", "Sur", "Este", "Oeste", "Centro"] e imprime cada región en mayúsculas.
+enumerate****: recorre la misma lista imprimiendo "Región 1: Norte", "Región 2: Sur", etc. Usa enumerate(regiones, start=1).
+Lista de listas: recorre el inventario del ejercicio 2 desempaquetando cada fila en la cabecera del bucle e imprime una línea por producto con su valor de stock:
+for almacen, producto, unidades, coste in inventario:
+    print(almacen, "|", producto, "|", round(unidades * coste, 2), "€")
+
+Diccionario: recorre tarifas_envio del ejercicio 12 con .items() e imprime una línea por región con su tarifa.
+Array NumPy: recorre np_precios con un for simple e imprime cada precio con un recargo del 4 % aplicado.
+Explica en una frase por qué al recorrer un diccionario hace falta .items() y qué se obtiene si no se usa.
+# 1. while — Reposición de stock
+
+stock = 12
+lote = 0
+
+while stock < 60:
+    lote = lote + 1
+    stock = stock + 8
+    print("Lote", lote, "-> stock:", stock)
+
+
+# 2. for sobre lista
+
+regiones = ["Norte", "Sur", "Este", "Oeste", "Centro"]
+
+for region in regiones:
+    print(region.upper())
+
+
+# 3. enumerate
+
+for posicion, region in enumerate(regiones, start=1):
+    print(f"Región {posicion}: {region}")
+
+
+# 4. Lista de listas
+
+for almacen, producto, unidades, coste in inventario:
+    print(
+        almacen,
+        "|",
+        producto,
+        "|",
+        round(unidades * coste, 2),
+        "€"
+    )
+
+
+# 5. Diccionario con .items()
+
+for region, tarifa in tarifas_envio.items():
+    print(f"{region} -> {tarifa:.2f} €")
+
+
+# 6. Array NumPy
+
+for precio in np_precios:
+    precio_recargo = precio * 1.04
+    print(round(precio_recargo, 2))
+
+
+# 7. Explicación
+# .items() permite obtener simultáneamente la clave y el valor.
+# Si no usamos .items(), al recorrer un diccionario obtenemos únicamente las claves.
+Ejercicio 20 — Iteración sobre DataFrames
+
+Trabaja sobre ventas, con las columnas calculadas del ejercicio 15.
+
+Se pide:
+
+Recorre las 5 primeras filas con .iterrows() e imprime la región, el producto y el importe neto de cada una:
+
+for etiqueta, fila in ventas.head(5).iterrows():
+    print(fila["region"], "|", fila["producto"], "|", fila["importe_neto"], "€")
+
+
+Crea la columna codigo_region con las tres primeras letras en mayúscula de la columna region, usando el accesor de texto de pandas:
+
+ventas["codigo_region"] = ventas["region"].str[:3].str.upper()
+
+Crea la columna segmento_ticket aplicando con .apply() la función clasificar_ticket que importaste de src/utilidades.py sobre importe_neto. Recuerda pasar la función sin paréntesis.
+Cuenta cuántos pedidos hay en cada segmento con .value_counts().
+Crea en sensores la columna eficiencia como unidades_producidas / temperatura_c, redondeada a tres decimales con .round(3). Esta operación no necesita bucle: pandas la aplica a toda la columna de golpe.
+
+Construye con un bucle for el diccionario resumen_por_region, cuyas claves sean las regiones y cuyos valores sean la facturación neta total de cada una:
+
+resumen_por_region = {}
+
+for region in ventas["region"].unique():
+    filtrado = ventas[ventas["region"] == region]
+    resumen_por_region[region] = round(filtrado["importe_neto"].sum(), 2)
+
+print(resumen_por_region)
+
+
+Compara el diccionario anterior con el resultado del .groupby("region") del ejercicio 15 y confirma que las cifras coinciden. Explica en una frase cuál de las dos formas prefieres y por qué.
+
+Comprobación: la región Norte debe encabezar el diccionario con 44 576,97 € de facturación neta.
+# 1. Recorrer las 5 primeras filas con iterrows()
+
+for etiqueta, fila in ventas.head(5).iterrows():
+    print(
+        fila["region"],
+        "|",
+        fila["producto"],
+        "|",
+        fila["importe_neto"],
+        "€"
+    )
+
+
+# 2. Crear codigo_region con las 3 primeras letras en mayúscula
+
+ventas["codigo_region"] = (
+    ventas["region"].str[:3].str.upper()
+)
+
+print(ventas[["region", "codigo_region"]].head())
+
+
+# 3. Crear segmento_ticket con .apply()
+
+ventas["segmento_ticket"] = (
+    ventas["importe_neto"].apply(clasificar_ticket)
+)
+
+print(
+    ventas[["importe_neto", "segmento_ticket"]].head()
+)
+
+
+# 4. Contar pedidos por segmento
+
+print(
+    ventas["segmento_ticket"].value_counts()
+)
+
+
+# 5. Crear eficiencia en sensores
+
+sensores["eficiencia"] = (
+    sensores["unidades_producidas"] /
+    sensores["temperatura_c"]
+).round(3)
+
+print(
+    sensores[
+        ["unidades_producidas", "temperatura_c", "eficiencia"]
+    ].head()
+)
+
+
+# 6. Crear resumen_por_region con un bucle
+
+resumen_por_region = {}
+
+for region in ventas["region"].unique():
+    filtrado = ventas[ventas["region"] == region]
+    resumen_por_region[region] = round(
+        filtrado["importe_neto"].sum(),
+        2
+    )
+
+print(resumen_por_region)
+
+
+# 7. Comparar con groupby()
+
+facturacion_groupby = (
+    ventas.groupby("region")["importe_neto"]
+    .sum()
+    .round(2)
+)
+
+print(facturacion_groupby)
+print(resumen_por_region)
+
+# Comprobar que coinciden
+for region in resumen_por_region:
+    print(
+        region,
+        resumen_por_region[region] == facturacion_groupby[region]
+    )
+
+# Las cifras coinciden.
+# Prefiero groupby() porque es más directo, eficiente y apropiado
+# para realizar agregaciones sobre DataFrames.
